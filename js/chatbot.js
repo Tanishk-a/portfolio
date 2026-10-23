@@ -2,14 +2,12 @@
   "use strict";
 
   var MAX_MESSAGE_LENGTH = 500;
-  var HISTORY_TURNS = 6;
   var STARTERS = [
-    "What projects have you completed?",
-    "What was corrected in the buggy code project?",
-    "Explain your Python programs.",
+    "What projects has Tanishka built?",
+    "Tell me about the Quiz application.",
+    "What technologies and skills does she use?",
   ];
 
-  var history = [];
   var waiting = false;
   var lastFocus = null;
 
@@ -19,6 +17,50 @@
   var inputEl;
   var sendBtn;
   var closeBtn;
+
+  // Knowledge base for fake AI responses
+  var KNOWLEDGE = [
+    {
+      patterns: ["project", "work", "portfolio", "built", "show me", "repos"],
+      response:
+        "Tanishka has built several key projects featured here:\n1. Factorial Calculator (Python algorithms & CLI)\n2. Fibonacci Series Generator (Python algorithms & CLI)\n3. Struct to Dict Converter (Python data structures & f-strings)\n4. Buggy Code Debugging & Refactoring (RED->FIX->GREEN testing with Cursor AI)\n5. Interactive Quiz Application (dynamic JavaScript web app)\n\nYou can click on any GitHub button in the Projects section to view the repositories!",
+    },
+    {
+      patterns: ["quiz", "game", "interactive web"],
+      response:
+        "The Interactive Quiz Application is a dynamic web app built with vanilla HTML5, CSS3, and JavaScript. It features timer-based challenges, real-time score calculation, and dynamic question rendering. You can check it out on GitHub: https://github.com/Tanishk-a/quiz",
+    },
+    {
+      patterns: ["bug", "debug", "refactor", "cursor", "red", "green"],
+      response:
+        "The Buggy Code project demonstrates a disciplined RED -> FIX -> GREEN unit test development cycle using Cursor AI to diagnose logic flaws, boundary errors, and write robust unit tests in Python (https://github.com/Tanishk-a/buggy-code.git).",
+    },
+    {
+      patterns: ["python", "factorial", "fibonacci", "struct", "dict", "algorithm"],
+      response:
+        "Tanishka's Python repositories showcase foundational algorithmic design and clean coding:\n• Factorial Calculator (https://github.com/Tanishk-a/factorial.git)\n• Fibonacci Series (https://github.com/Tanishk-a/fibonacci-pe)\n• Struct-to-Dict converter (https://github.com/Tanishk-a/struct-to-dict.git)",
+    },
+    {
+      patterns: ["skill", "stack", "tech", "language", "tool", "framework"],
+      response:
+        "Tanishka's technical stack includes:\n• Languages: Python, JavaScript, HTML5, CSS3, C, C++, Java, SQL\n• Databases: MySQL, MongoDB\n• Tools & Workflows: Git, GitHub, Vercel, VS Code, Cursor AI, Antigravity AI\n• Core Competencies: Responsive Web Design, Unit Testing, and AI-assisted engineering.",
+    },
+    {
+      patterns: ["about", "who is", "education", "college", "degree", "university", "jecrc"],
+      response:
+        "Tanishka Minghlani is a 2nd Year Computer Science and Engineering student pursuing her B.Tech at JECRC University, Jaipur (Graduation: 2028). She is passionate about modern web technologies, algorithms, and AI engineering.",
+    },
+    {
+      patterns: ["contact", "email", "reach", "hire", "linkedin", "github"],
+      response:
+        "You can connect with Tanishka via:\n• GitHub: https://github.com/Tanishk-a\n• LinkedIn: https://www.linkedin.com/in/tanishka-minghlani/\n• Or send a message using the Contact form below!",
+    },
+    {
+      patterns: ["hi", "hello", "hey", "greetings"],
+      response:
+        "Hello! 👋 I'm Tanishka's Portfolio AI Assistant. Ask me anything about her projects, skills, education, or GitHub repositories!",
+    },
+  ];
 
   init();
 
@@ -93,7 +135,7 @@
     var dot = document.createElement("span");
     dot.className = "status-dot";
     dot.setAttribute("aria-hidden", "true");
-    status.append(dot, document.createTextNode("Active"));
+    status.append(dot, document.createTextNode("Active (Client AI)"));
     meta.append(title, status);
 
     closeBtn = document.createElement("button");
@@ -124,7 +166,7 @@
     inputEl.type = "text";
     inputEl.maxLength = MAX_MESSAGE_LENGTH;
     inputEl.setAttribute("aria-label", "Message the portfolio assistant");
-    inputEl.placeholder = "Ask about projects…";
+    inputEl.placeholder = "Ask about projects or skills…";
 
     sendBtn = document.createElement("button");
     sendBtn.type = "button";
@@ -136,7 +178,7 @@
 
     var attr = document.createElement("p");
     attr.className = "chat-attr";
-    attr.textContent = "Answers grounded in student portfolio data";
+    attr.textContent = "Instant responses powered by Portfolio Intelligence";
 
     footer.append(compose, attr);
     return footer;
@@ -145,7 +187,7 @@
   function showWelcome() {
     appendBubble(
       "assistant",
-      "Hi — I can answer questions about this student's projects, skills, and coursework. Try a prompt below."
+      "Hi! I'm Tanishka's portfolio assistant. I can answer questions about her projects, skills, education, and GitHub code. Ask me anything or select a prompt below!"
     );
     var wrap = document.createElement("div");
     wrap.className = "starter-prompts";
@@ -183,15 +225,22 @@
     sendPrompt(inputEl.value);
   }
 
-  function sendPrompt(raw) {
-    if (window.location.protocol === "file:") {
-      appendBubble(
-        "error",
-        "Open this site through your Vercel URL or http://localhost:3000 (run `vercel dev`). It does not work when opened as a file."
-      );
-      return;
+  function generateFakeAiResponse(query) {
+    var lower = query.toLowerCase();
+    for (var i = 0; i < KNOWLEDGE.length; i++) {
+      var item = KNOWLEDGE[i];
+      for (var j = 0; j < item.patterns.length; j++) {
+        if (lower.indexOf(item.patterns[j]) !== -1) {
+          return item.response;
+        }
+      }
     }
+    return (
+      "I'm specialized in Tanishka's background and projects. You can ask about her repositories (Factorial, Fibonacci, Struct-to-Dict, Buggy Code, Quiz App), technical skills, or education at JECRC University!"
+    );
+  }
 
+  function sendPrompt(raw) {
     var message = String(raw || "").trim();
     if (waiting) return;
     if (!message) return;
@@ -202,109 +251,31 @@
 
     inputEl.value = "";
     appendBubble("user", message);
-    history.push({ role: "user", content: message });
-    trimHistory();
-    requestReply(message);
-  }
 
-  function trimHistory() {
-    if (history.length > HISTORY_TURNS) {
-      history = history.slice(-HISTORY_TURNS);
-    }
-  }
+    waiting = true;
+    inputEl.disabled = true;
+    sendBtn.disabled = true;
 
-  function setWaiting(isWaiting) {
-    waiting = isWaiting;
-    inputEl.disabled = isWaiting;
-    sendBtn.disabled = isWaiting;
-  }
-
-  function requestReply(message) {
-    var url = "/api/chat";
-    setWaiting(true);
     var typing = appendTyping();
 
-    fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: message,
-        history: history.slice(0, -1),
-      }),
-    })
-      .then(function (response) {
-        return response.text().then(function (rawText) {
-          return { response: response, rawText: rawText };
-        });
-      })
-      .then(function (result) {
-        typing.remove();
-        var status = result.response.status;
-        var rawText = result.rawText;
-        var data = null;
-        try {
-          data = rawText ? JSON.parse(rawText) : null;
-        } catch (parseError) {
-          data = null;
-        }
+    // Simulate smart thinking delay (400ms - 800ms)
+    var delay = 450 + Math.floor(Math.random() * 300);
+    setTimeout(function () {
+      typing.remove();
+      var reply = generateFakeAiResponse(message);
+      appendBubble("assistant", reply);
 
-        if (result.response.ok && data && data.reply) {
-          appendBubble("assistant", data.reply);
-          history.push({ role: "assistant", content: data.reply });
-          trimHistory();
-          return;
-        }
-
-        console.error("Chat API failure URL:", url);
-        console.error("Chat API failure status:", status);
-        console.error("Chat API failure response text:", rawText);
-
-        if (status === 404) {
-          appendBubble(
-            "error",
-            "The assistant service isn't available right now."
-          );
-          return;
-        }
-        if (status === 405) {
-          appendBubble("error", "The assistant is misconfigured.");
-          return;
-        }
-        if (status === 429) {
-          appendBubble("error", "The assistant is busy. Try again shortly.");
-          return;
-        }
-        if (status === 500) {
-          appendBubble(
-            "error",
-            (data && data.error) || "The assistant is not configured yet."
-          );
-          return;
-        }
-        appendBubble(
-          "error",
-          (data && data.error) ||
-            "The assistant is unavailable right now. Please try again shortly."
-        );
-      })
-      .catch(function (err) {
-        console.error("Chat API failure URL:", url);
-        console.error("Chat network error (fetch threw):", err);
-        typing.remove();
-        appendBubble(
-          "error",
-          "I could not reach the assistant. Check your connection and try again."
-        );
-      })
-      .finally(function () {
-        setWaiting(false);
-        inputEl.focus();
-      });
+      waiting = false;
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }, delay);
   }
 
   function appendBubble(kind, text) {
     var bubble = document.createElement("div");
     bubble.className = "chat-bubble " + kind;
+    bubble.style.whiteSpace = "pre-line";
     bubble.textContent = text;
     messagesEl.appendChild(bubble);
     scrollToBottom();
