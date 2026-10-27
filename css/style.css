@@ -121,8 +121,12 @@ a:hover {
   color: var(--text-primary);
   text-decoration: none;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
+}
+
+.logo strong {
+  font-weight: 800;
 }
 
 .logo:hover {
@@ -330,6 +334,20 @@ main {
   font-size: clamp(1.9rem, 4vw, 3rem);
   letter-spacing: -0.03em;
   line-height: 1.15;
+}
+
+.hero-greeting {
+  display: block;
+  font-weight: 500;
+  font-size: 0.72em;
+  color: var(--text-secondary);
+}
+
+.hero-name {
+  display: block;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 0.15rem;
 }
 
 .hero-pitch {
@@ -629,6 +647,40 @@ main {
 
 .form-status.is-error {
   color: var(--danger);
+}
+
+.weather-box {
+  display: grid;
+  gap: 1rem;
+  max-width: 520px;
+}
+
+.weather-controls {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.weather-controls input {
+  flex: 1;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border-radius: 10px;
+  font: inherit;
+}
+
+#weatherResult {
+  padding: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+#weatherResult strong {
+  color: var(--text-primary);
 }
 
 .site-footer {

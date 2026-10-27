@@ -8,7 +8,7 @@ A single-page, production-ready personal portfolio for a Computer Science studen
 
 ## Features
 
-- Sticky header with logo `&lt;Tanishka Minghlani/&gt;`, in-page nav, theme toggle, and GitHub link
+- Sticky header with logo `TANISHKA MINGHLANI` (bold), in-page nav, theme toggle, and GitHub link
 - Mobile hamburger menu; smooth scroll and active-section highlighting
 - Dark theme by default, light theme via `[data-theme="light"]`, persisted in `localStorage` (`theme`)
 - About (education timeline + career objectives), skills pills, five coursework projects, contact + footer

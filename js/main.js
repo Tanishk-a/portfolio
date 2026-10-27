@@ -15,6 +15,7 @@
   setFooterYear();
   renderProjects();
   initProjectControls();
+  initWeather();
 
   function getInitialTheme() {
     try {
@@ -70,7 +71,7 @@
     var toggle = document.querySelector(".nav-toggle");
     var nav = document.getElementById("site-nav");
     var links = document.querySelectorAll('.nav-list a[href^="#"]');
-    var sections = ["about", "skills", "projects", "contact"]
+    var sections = ["about", "skills", "projects", "weather", "contact"]
       .map(function (id) {
         return document.getElementById(id);
       })
@@ -287,4 +288,104 @@
     card.append(tag, title, desc, techList, links);
     return card;
   }
+
+  function initWeather() {
+    var button = document.getElementById("weatherButton");
+    var input = document.getElementById("cityInput");
+    var result = document.getElementById("weatherResult");
+    if (!button || !input || !result) return;
+
+    function fetchWeather() {
+      var city = input.value.trim();
+      if (!city) {
+        result.innerHTML = '<span style="color: var(--danger, #fb7185);">Please enter a city name.</span>';
+        return;
+      }
+
+      result.textContent = "Fetching weather for " + city + "...";
+
+      // Use Open-Meteo geocoding + weather API (free, reliable, no API key required)
+      var geoUrl = "https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(city) + "&count=1&language=en&format=json";
+
+      fetch(geoUrl)
+        .then(function (res) {
+          if (!res.ok) throw new Error("Network response was not ok");
+          return res.json();
+        })
+        .then(function (geoData) {
+          if (!geoData.results || !geoData.results.length) {
+            throw new Error("City not found. Please try another city.");
+          }
+          var place = geoData.results[0];
+          var lat = place.latitude;
+          var lon = place.longitude;
+          var cityName = place.name + (place.country ? ", " + place.country : "");
+
+          var weatherUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m";
+
+          return fetch(weatherUrl)
+            .then(function (res) {
+              if (!res.ok) throw new Error("Failed to fetch weather data");
+              return res.json();
+            })
+            .then(function (data) {
+              var current = data.current;
+              var weatherCode = current.weather_code;
+              var weatherDesc = getWeatherDescription(weatherCode);
+
+              result.innerHTML =
+                "<div><strong>" + escapeHtml(cityName) + "</strong></div>" +
+                "<div>🌡️ <strong>Temperature:</strong> " + current.temperature_2m + "°C</div>" +
+                "<div>☁️ <strong>Condition:</strong> " + weatherDesc + "</div>" +
+                "<div>💧 <strong>Humidity:</strong> " + current.relative_humidity_2m + "%</div>" +
+                "<div>💨 <strong>Wind Speed:</strong> " + current.wind_speed_10m + " km/h</div>";
+            });
+        })
+        .catch(function (err) {
+          result.innerHTML = '<span style="color: var(--danger, #fb7185);">' + escapeHtml(err.message || "Failed to load weather") + "</span>";
+        });
+    }
+
+    button.addEventListener("click", fetchWeather);
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        fetchWeather();
+      }
+    });
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function getWeatherDescription(code) {
+    var map = {
+      0: "Clear sky ☀️",
+      1: "Mainly clear 🌤️",
+      2: "Partly cloudy ⛅",
+      3: "Overcast ☁️",
+      45: "Fog 🌫️",
+      48: "Depositing rime fog 🌫️",
+      51: "Light drizzle 🌦️",
+      53: "Moderate drizzle 🌧️",
+      55: "Dense drizzle 🌧️",
+      61: "Slight rain 🌦️",
+      63: "Moderate rain 🌧️",
+      65: "Heavy rain 🌧️",
+      71: "Slight snowfall 🌨️",
+      73: "Moderate snowfall 🌨️",
+      75: "Heavy snowfall ❄️",
+      80: "Slight rain showers 🌦️",
+      81: "Moderate rain showers 🌧️",
+      82: "Violent rain showers ⛈️",
+      95: "Thunderstorm ⚡",
+      96: "Thunderstorm with slight hail ⛈️",
+      99: "Thunderstorm with heavy hail ⛈️"
+    };
+    return map[code] || "Partly cloudy ⛅";
+  }
 })();
+

@@ -40,7 +40,7 @@
 
     <header class="site-header" id="top">
       <div class="header-inner">
-        <a class="logo" href="#top">&lt;Tanishka Minghlani/&gt;</a>
+        <a class="logo" href="#top"><strong>TANISHKA MINGHLANI</strong></a>
 
         <button
           class="nav-toggle"
@@ -59,6 +59,7 @@
             <li><a href="#about">About</a></li>
             <li><a href="#skills">Skills</a></li>
             <li><a href="#projects">Projects</a></li>
+            <li><a href="#weather">Weather</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
         </nav>
@@ -108,7 +109,10 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="availability-tag">Available for opportunities</p>
-          <h1 id="hero-title">Hi, I'm Tanishka Minghlani</h1>
+          <h1 id="hero-title">
+            <span class="hero-greeting">Hi,</span>
+            <span class="hero-name">I am Tanishka Minghlani</span>
+          </h1>
           <p class="hero-pitch">
             A 2nd Year Computer Science and Engineering student at JECRC University, Jaipur, pursuing my B.Tech degree. I am passionate about learning modern technologies, crafting responsive web experiences, and exploring machine learning.
             <br />
@@ -294,6 +298,25 @@
         </p>
       </section>
 
+      <section class="section" id="weather" aria-labelledby="weather-title">
+        <h2 id="weather-title">Weather</h2>
+        <div class="weather-box">
+          <div class="weather-controls">
+            <input
+              type="text"
+              id="cityInput"
+              placeholder="Enter a city"
+            />
+            <button id="weatherButton" class="btn btn-primary" type="button">
+              Get Weather
+            </button>
+          </div>
+          <div id="weatherResult">
+            Enter a city to see the weather.
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="contact" aria-labelledby="contact-title">
         <h2 id="contact-title">Contact</h2>
         <p class="contact-intro">
@@ -317,7 +340,7 @@
             >
           </li>
           <li>
-            <a href="mailto:[your-email]">[your-email]</a>
+            <a href="mailto:email@example.com">Email</a>
           </li>
         </ul>
 
